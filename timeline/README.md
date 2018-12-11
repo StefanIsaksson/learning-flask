@@ -19,13 +19,20 @@ Examples of trying out the micro web framework to build a simple web page.
 
 `pip install Flask`
 
+Project uses flask-sqlalchemy for persistence, to install package write:
+
+`pip install flask flask-sqlalchemy`
+
 ### Enter and Exit the project environment
 
 `deactivate` leaves the project environment
 
 `workon learning-flask` switches to project environment
 
-## Start up learning-flask
+### Create database
+Run `create_db.py` to create database tables
+
+## Start web app
 
 `python app.py`
 
