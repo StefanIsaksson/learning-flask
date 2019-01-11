@@ -8,6 +8,7 @@
 |/generations/<generation_number> |GET   |List of pokemons for given generation                   |
 |/pokemons/<pokedex_number>       |GET   |Pokemon information, e.g. attack and defense            |
 |/pokemons/                       |POST  |Adds a pokemon                                          |
+|/pokemons/<pokedex_number>       |DELETE|Deletes a pokemon                                       |
 
 ## Requires Flask and Pandas
 `pip install Flask`

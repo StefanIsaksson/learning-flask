@@ -12,28 +12,51 @@ def get_db_connection():
 
 @app.route('/generations/')
 def get_generations():
-    df = pd.read_sql_query("select generation, count(name) number_of_pokemons from pokemons group by generation;",
+    df = pd.read_sql_query("SELECT generation, COUNT(name) number_of_pokemons FROM pokemons GROUP BY generation;",
                            con=get_db_connection())
-    return df.to_json(orient='records')
+    if df.empty:
+        return Response("", status=404)
+    else:
+        response_message = df.to_json(orient='records')
+        return Response(response_message, status=200, mimetype='application/json')
 
 
 @app.route('/generations/<int:generation>')
-def get_pokemons_by_generation(generation):
-    df = pd.read_sql_query("select pokedex_number, name from pokemons where generation=?;",
+def get_pokemons(generation):
+    df = pd.read_sql_query("SELECT pokedex_number, name FROM pokemons WHERE generation=?;",
                            params=[(generation)],
                            con=get_db_connection())
-    return df.to_json(orient='records')
+    if df.empty:
+        return Response("", status=404)
+    else:
+        response_message = df.to_json(orient='records')
+        return Response(response_message, status=200, mimetype='application/json')
 
 
 @app.route('/pokemons/<int:pokedex_number>', methods=['GET'])
-def get_pokemon_by_pokedex_number(pokedex_number):
-    print(pokedex_number)
-    df = pd.read_sql_query("select pokedex_number, name, generation, type1, type2, is_legendary, "
-                           "hp, attack, defense, sp_attack, sp_defense, speed from pokemons where pokedex_number = ?;",
+def get_pokemon(pokedex_number):
+    df = pd.read_sql_query("SELECT pokedex_number, name, generation, type1, type2, is_legendary, "
+                           "hp, attack, defense, sp_attack, sp_defense, speed FROM pokemons WHERE pokedex_number = ?;",
                            params={pokedex_number},
-                           index_col='pokedex_number',
                            con=get_db_connection())
-    return df.to_json(orient='records')
+    if df.empty:
+        return Response("", status=404)
+    else:
+        response_message = df.to_json(orient='records')
+        return Response(response_message, status=200, mimetype='application/json')
+
+
+@app.route('/pokemons/<int:pokedex_number>', methods=['DELETE'])
+def delete_pokemon(pokedex_number):
+    db = get_db_connection()
+    cursor = db.cursor()
+    cursor.execute("DELETE FROM pokemons WHERE pokedex_number = ?", (pokedex_number,))
+    db.commit()
+    result = cursor.rowcount
+    if result > 0:
+        return Response("", status=204)
+    else:
+        return Response("", status=404)
 
 
 def valid_pokemon(pokemon):
