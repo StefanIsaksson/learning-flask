@@ -97,5 +97,30 @@ def add_pokemon():
         return response
 
 
+@app.route('/pokemons/<int:pokedex_number>', methods=['PUT'])
+def replace_pokemon(pokedex_number):
+    request_data = request.get_json()
+    if valid_pokemon(request_data):
+        db = get_db_connection()
+        cursor = db.cursor()
+
+        cursor.execute('''UPDATE pokemons SET name = ? WHERE pokedex_number = ? ''',
+                       (request_data['name'], pokedex_number))
+
+        db.commit()
+        response = Response("",status=204, mimetype='application/json')
+        return response
+    else:
+        error_msg = {
+            "error" : "Invalid pokemon passed in request",
+            "helpString" : "Data passed should look similar to this: "
+                           "{'name':'Bulbasaur','generation':1,'type1':'grass','type2':'poison',"
+                           "'is_legendary':0,'hp':45,'attack':49,'defense':49,'sp_attack':65,"
+                           "'sp_defense':65,'speed':45}"
+        }
+        response = Response(json.dumps(error_msg), status=400, mimetype='application/json')
+        return response
+
+
 if __name__ == "__main__":
     app.run(debug=True)

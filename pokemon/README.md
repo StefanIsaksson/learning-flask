@@ -9,6 +9,7 @@
 |/pokemons/<pokedex_number>       |GET   |Pokemon information, e.g. attack and defense            |
 |/pokemons/                       |POST  |Adds a pokemon                                          |
 |/pokemons/<pokedex_number>       |DELETE|Deletes a pokemon                                       |
+|/pokemons/<pokedex_number>       |PUT   |Updates a pokemon                                       |
 
 ## Requires Flask and Pandas
 `pip install Flask`
