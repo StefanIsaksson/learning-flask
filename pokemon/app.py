@@ -57,6 +57,32 @@ def get_pokemon(pokedex_number):
         response_message = df.to_json(orient='records')
         return Response(response_message, status=200, mimetype='application/json')
 
+@app.route('/pokemons_stats/<int:pokedex_number>', methods=['GET'])
+def get_pokemon_with_extra_stats(pokedex_number):
+    df = pd.read_sql_query("SELECT pokedex_number, name, generation, type1, type2, is_legendary, "
+                           "hp, attack, defense, sp_attack, sp_defense, speed FROM pokemons;",
+                           con=get_db_connection())
+    if df.empty:
+        return Response("", status=404)
+    else:
+        df['hp_rank_pct'] = df['hp'].rank(pct=True, ascending=1)
+        df['attack_rank_pct'] = df['attack'].rank(pct=True, ascending=1)
+        df['defense_rank_pct'] = df['defense'].rank(pct=True, ascending=1)
+        df['sp_attack_rank_pct'] = df['sp_attack'].rank(pct=True, ascending=1)
+        df['sp_defense_rank_pct'] = df['sp_defense'].rank(pct=True, ascending=1)
+        df['speed_rank_pct'] = df['speed'].rank(pct=True, ascending=1)
+
+        df['hp_rank'] = df['hp'].rank(method='first', ascending=False)
+        df['attack_rank'] = df['attack'].rank(method='first', ascending=False)
+        df['defense_rank'] = df['defense'].rank(method='first', ascending=False)
+        df['sp_attack_rank'] = df['sp_attack'].rank(method='first', ascending=False)
+        df['sp_defense_rank'] = df['sp_defense'].rank(method='first', ascending=False)
+        df['speed_rank'] = df['speed'].rank(method='first', ascending=False)
+        df['total_nr_pokemons_ranked'] = df.shape[0]
+
+        df = df[df['pokedex_number'] == pokedex_number]
+        response_message = df.to_json(orient='records')
+        return Response(response_message, status=200, mimetype='application/json')
 
 @app.route('/pokemons/<int:pokedex_number>', methods=['DELETE'])
 def delete_pokemon(pokedex_number):
