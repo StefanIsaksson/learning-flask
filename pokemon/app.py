@@ -1,9 +1,12 @@
-from flask import Flask, jsonify, request, Response
+from flask import Flask, jsonify, request, Response, send_from_directory
 import sqlite3
 import pandas as pd
 import json
+from flask_cors import CORS
 
-app = Flask(__name__)
+
+app = Flask(__name__, static_url_path='')
+CORS(app)
 
 
 def get_db_connection():
@@ -22,7 +25,7 @@ def get_generations():
 
 
 @app.route('/generations/<int:generation>')
-def get_pokemons(generation):
+def get_pokemons_by_generation(generation):
     df = pd.read_sql_query("SELECT pokedex_number, name FROM pokemons WHERE generation=?;",
                            params=[(generation)],
                            con=get_db_connection())
@@ -32,6 +35,15 @@ def get_pokemons(generation):
         response_message = df.to_json(orient='records')
         return Response(response_message, status=200, mimetype='application/json')
 
+@app.route('/pokemons/')
+def get_pokemons():
+    df = pd.read_sql_query("SELECT pokedex_number, name, generation FROM pokemons;",
+                           con=get_db_connection())
+    if df.empty:
+        return Response("", status=404)
+    else:
+        response_message = df.to_json(orient='records')
+        return Response(response_message, status=200, mimetype='application/json')
 
 @app.route('/pokemons/<int:pokedex_number>', methods=['GET'])
 def get_pokemon(pokedex_number):
@@ -120,12 +132,6 @@ def replace_pokemon(pokedex_number):
         }
         response = Response(json.dumps(error_msg), status=400, mimetype='application/json')
         return response
-
-
-@app.after_request
-def apply_caching(response):
-    response.headers["Access-Control-Allow-Origin"] = '*'
-    return response
 
 
 if __name__ == "__main__":

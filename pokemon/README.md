@@ -7,6 +7,7 @@
 |/generations/                    |GET   |Lists pokemon generations                               |
 |/generations/<generation_number> |GET   |List of pokemons for given generation                   |
 |/pokemons/<pokedex_number>       |GET   |Pokemon information, e.g. attack and defense            |
+|/pokemons/                       |GET   |List of all pokemons                                          |
 |/pokemons/                       |POST  |Adds a pokemon                                          |
 |/pokemons/<pokedex_number>       |DELETE|Deletes a pokemon                                       |
 |/pokemons/<pokedex_number>       |PUT   |Updates a pokemon                                       |
