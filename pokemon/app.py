@@ -35,15 +35,17 @@ def get_pokemons_by_generation(generation):
         response_message = df.to_json(orient='records')
         return Response(response_message, status=200, mimetype='application/json')
 
+
 @app.route('/pokemons/')
 def get_pokemons():
-    df = pd.read_sql_query("SELECT pokedex_number, name, generation FROM pokemons;",
+    df = pd.read_sql_query("SELECT pokedex_number, name, generation, is_legendary, type1, type2 FROM pokemons;",
                            con=get_db_connection())
     if df.empty:
         return Response("", status=404)
     else:
         response_message = df.to_json(orient='records')
         return Response(response_message, status=200, mimetype='application/json')
+
 
 @app.route('/pokemons/<int:pokedex_number>', methods=['GET'])
 def get_pokemon(pokedex_number):
